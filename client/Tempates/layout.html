@@ -1,0 +1,18 @@
+
+<body>
+	{{renderPage}}
+</body>
+
+<template name="layout">
+
+{{>navbar}}
+	<div class ="container">
+		<div class ="row">
+			<div class ="col-md-12">
+				{{>yield}}
+			</div>
+		</div>
+	</div>
+
+
+</template>
