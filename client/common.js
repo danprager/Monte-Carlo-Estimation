@@ -25,7 +25,7 @@ if (Meteor.isClient) {
       var runs = 10000; //up this for final edition
       var iterations;
       var past_sprints = document.getElementById("past_sprints").value.replace(',', ' ').split(' ').map(function(s){return parseInt(s, 10)});
-      var stories = document.getElementById('project_size').value;
+      var stories = Math.min(1000, Math.max(1, document.getElementById('project_size').value));
       var simulations = new Array(runs);
 
       var choice = function(xs) { return xs[Math.floor(Math.random() * xs.length)]; }	 
