@@ -1,13 +1,11 @@
 if (Meteor.isClient) {
 
     Template.estimations.helpers({
-      simulations: function () {
-        return Session.get('simulation')},
-
-      chart: function () {
-	return Session.get('chart');
-      }
-
+      simulations: function () { return Session.get('simulation') },
+      chart: function () { return Session.get('chart'); },
+      median: function () { return Session.get('median') },
+      lower: function () { return Session.get('lower') },
+      upper: function () { return Session.get('upper') }
     });
 
       Template.navbar.helpers({
@@ -82,10 +80,18 @@ if (Meteor.isClient) {
 	      + range(101).join(',');
       }
 	  
-console.log(dilute(simulations));
+     var getSimulationValue = function (x) {
+	 return Math.round(10 * simulations[Math.floor(runs * x)]) / 10.0; 
+     }
+
 
       Session.set('simulation', simulations);
       Session.set('chart', googleChart(simulations));
+      Session.set('median', getSimulationValue(0.5));
+      Session.set('lower',  getSimulationValue(0.05));
+      Session.set('upper',  getSimulationValue(0.95));
+
+      document.getElementById("results").removeAttribute("hidden");
       }
     });
 
