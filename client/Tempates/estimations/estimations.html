@@ -3,19 +3,33 @@
             <div class="form-group">
             <label>Completed stories in historical sprints</label>
             <br>
-            <input type="text" name="past_sprints" id="past_sprints" value="11 12 4 12" />
+            <input type="text" name="past_sprints" id="past_sprints" value="5 7 11 12 4 7" />
             </div>
             <div class="form-group">
             <label>How many stories are in the new project?</label><br>
-            <input type="number" name="project-size" id="project_size" value="50" />
+            <input type="number" name="project-size" id="project_size" value="50"
+		   min='1' max='1000'/>
             </div>
             <div class="form-group">
-            <input type="button" id="btnsim" class="btn btn-default" value="Simulate">
+            <input type="button" id="btnsim" class="btn btn-default" value="Simulate!">
             </div>
         </form>
 
-	<b>Cumulative likelihood of project completion in x sprints</b>
-	<br/>
-	<img src='{{chart}}'/>
+	<div id='results' hidden>
+	  <h3>Forecast</h3>
+	  <b>Full range</b>: {{min}} to {{max}} sprints
+	  <br>
+	  <b>Likely range</b>: {{lower}} to {{upper}} sprints (90% confidence)
+	  <br/>
+	  <b>Median</b>: {{median}} sprints 
+	  <br/>
+	  <br/>
+	  <b>Likelihood of project completion in x sprints</b>
+	  <br/>
+	  <img src='{{chart}}'/>
+	  <br/>
+	  Based on {{runs}} simulations.
+	</div>
+
 
 </template>
