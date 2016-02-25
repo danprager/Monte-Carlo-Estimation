@@ -1,11 +1,13 @@
 if (Meteor.isClient) {
 
     Template.estimations.helpers({
-      simulations: function () { return Session.get('simulation') },
       chart: function () { return Session.get('chart'); },
       median: function () { return Session.get('median') },
       lower: function () { return Session.get('lower') },
-      upper: function () { return Session.get('upper') }
+      upper: function () { return Session.get('upper') },
+      min: function () { return Session.get('min') },
+      max: function () { return Session.get('max') },
+      runs: function () { return Session.get('runs') }
     });
 
       Template.navbar.helpers({
@@ -20,11 +22,11 @@ if (Meteor.isClient) {
       'click #btnsim': function () {
 
       event.preventDefault();
-      var runs = 250; //up this for final edition
+      var runs = 10000; //up this for final edition
       var iterations;
       var past_sprints = document.getElementById("past_sprints").value.replace(',', ' ').split(' ').map(function(s){return parseInt(s, 10)});
       var stories = document.getElementById('project_size').value;
-      var simulations = [];
+      var simulations = new Array(runs);
 
       var choice = function(xs) { return xs[Math.floor(Math.random() * xs.length)]; }	 
 
@@ -40,7 +42,7 @@ if (Meteor.isClient) {
 
       //Create an array of simulated sprints * the number of runs
       for (i = 0; i < runs+1; i++) {          
-	  simulations.push(simulate(stories));
+	  simulations[i] = simulate(stories);
         }
       simulations = simulations.map(function(x) { return Math.round(x*100) / 100 });
       simulations.sort(function (a, b) { return a - b; });
@@ -54,10 +56,11 @@ if (Meteor.isClient) {
 	  return result;
       }
 
-      var dilute = function (xs) {
-	  var result = [];
-	  var step = xs.length / 100.0;
-	  for (i=0; i < 101; i++) {  result.push(xs[Math.floor(i*step)]); }
+      var dilute = function (xs, n) {
+	  var result = new Array(n);
+	  var step = xs.length / n;
+	  for (i=0; i < n-1; i++) { result[i] = xs[Math.floor(i*step)]; }
+	  result[result.length-1] = xs[xs.length-1];
 	  return result; 
       }
 
@@ -75,21 +78,24 @@ if (Meteor.isClient) {
 	      + "&chg=" + Math.round(100 / (M - m)) + ",10"
 	      + "&chxr=0," + m + "," + M + "|1,0,100"
 	      + "&chd=t:"
-	      + dilute(sims).map(scale).join(',')
+	      + dilute(sims, 101).map(scale).join(',')
 	      + "|"
 	      + range(101).join(',');
       }
-	  
+
+     var oneDecimalPlace = function (x) { return Math.round(10 * x) / 10.0; }
+
      var getSimulationValue = function (x) {
-	 return Math.round(10 * simulations[Math.floor(runs * x)]) / 10.0; 
+	 return oneDecimalPlace(simulations[Math.floor(runs * x)]); 
      }
 
-
-      Session.set('simulation', simulations);
       Session.set('chart', googleChart(simulations));
       Session.set('median', getSimulationValue(0.5));
-      Session.set('lower',  getSimulationValue(0.05));
-      Session.set('upper',  getSimulationValue(0.95));
+      Session.set('lower', getSimulationValue(0.05));
+      Session.set('upper', getSimulationValue(0.95));
+      Session.set('min', getSimulationValue(0));
+      Session.set('max',oneDecimalPlace(simulations[simulations.length-1]));
+      Session.set('runs', runs);
 
       document.getElementById("results").removeAttribute("hidden");
       }

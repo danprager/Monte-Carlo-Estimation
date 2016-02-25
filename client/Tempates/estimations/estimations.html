@@ -16,14 +16,18 @@
 
 	<div id='results' hidden>
 	  <h3>Forecast</h3>
-	  <b>Range</b>: {{lower}} to {{upper}} sprints (90% confidence)
+	  <b>Full range</b>: {{min}} to {{max}} sprints
+	  <br>
+	  <b>Likely range</b>: {{lower}} to {{upper}} sprints (90% confidence)
 	  <br/>
 	  <b>Median</b>: {{median}} sprints 
 	  <br/>
 	  <br/>
-	  <b>Cumulative likelihood of project completion in x sprints</b>
+	  <b>Likelihood of project completion in x sprints</b>
 	  <br/>
 	  <img src='{{chart}}'/>
+	  <br/>
+	  Based on {{runs}} simulations.
 	</div>
 
 
