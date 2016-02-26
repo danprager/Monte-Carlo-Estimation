@@ -71,7 +71,7 @@ if (Meteor.isClient) {
 
 	  return "https://chart.googleapis.com/chart"
 	      + "?cht=lxy"
-	      + "&chs=300x300"
+	      + "&chs=400x300"
 	      + "&chxt=x,y"
 	      + "&chts=000000,20"
 	      + "&chco=0000FF"

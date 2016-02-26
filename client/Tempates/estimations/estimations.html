@@ -1,35 +1,60 @@
 <template name="estimations">
-        <form class="new-task">
-            <div class="form-group">
-            <label>Completed stories in historical sprints</label>
-            <br>
-            <input type="text" name="past_sprints" id="past_sprints" value="5 7 11 12 4 7" />
-            </div>
-            <div class="form-group">
-            <label>How many stories are in the new project?</label><br>
+
+<div class="row">
+  <div class="col-md-7">
+    <div class='jumbotron'>
+      <h1>Monte Carlo Estimation</h1>
+      <br/>
+      <form class="new-task">
+	<div class="form-group">
+          <p>Completed stories in past sprints
+            <input type="text" name="past_sprints" id="past_sprints" value="5 7 11 12 4 7"
+		   size='44' />
+	  </p>
+	</div>
+	<div class="form-group">
+          <p>How many stories are in the new project?&nbsp;
             <input type="number" name="project-size" id="project_size" value="50"
 		   min='1' max='1000'/>
-            </div>
-            <div class="form-group">
-            <input type="button" id="btnsim" class="btn btn-default" value="Simulate!">
-            </div>
-        </form>
-
-	<div id='results' hidden>
-	  <h3>Forecast</h3>
-	  <b>Full range</b>: {{min}} to {{max}} sprints
-	  <br>
-	  <b>Likely range</b>: {{lower}} to {{upper}} sprints (90% confidence)
-	  <br/>
-	  <b>Median</b>: {{median}} sprints 
-	  <br/>
-	  <br/>
-	  <b>Likelihood of project completion in x sprints</b>
-	  <br/>
-	  <img src='{{chart}}'/>
-	  <br/>
-	  Based on {{runs}} simulations.
+	  </p>
 	</div>
+	<br/>
+	<br/>
+	<br/>
+	<div class="form-group">
+          <input type="button" id="btnsim" class="btn btn-primary btn-lg" 
+		 value="Perform 10,000 simulations">
+	</div>
+      </form>
+    </div>
+  </div>
 
+  <div class="col-md-5 panel panel-default" id='results' hidden>
+    <div class='panel-body'>
+      <h1>Results</h1>
+      <table>
+	<tr>
+	  <td><b>Full range</b>:</td>
+	  <td> {{min}} &ndash; {{max}} sprints</td>
+      </tr>
+	<tr>
+	  <td><b>90% confidence</b>:&nbsp;</td>
+	  <td>{{lower}} &ndash; {{upper}} sprints</td>
+	</tr>
+	<tr>
+	  <td><b>Median</b>:</td> 
+	  <td>{{median}} sprints</td>
+	</tr>
+      </table>
+      
+      <h3>Likelihood of project completion</h3>
+      <table>
+	<tr><td> <img src='{{chart}}'/> </td></tr>
+	<tr><td style='text-align: center'><i>Number of sprints</i></td></tr>
+      </table>
+    </div>
+  </div>
+  
+</div>
 
 </template>
