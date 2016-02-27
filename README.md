@@ -5,7 +5,7 @@ Online demo: [http://monte-carlo-estimation.meteor.com/](http://monte-carlo-esti
 
 It gives an objective view of the uncertainty around project estimation based on historical data.
 
-This is a #noestimates technique!
+This is a #NoEstimates(http://neilkillick.com/category/noestimates/) technique!
 
 ## Usage
 
@@ -49,7 +49,7 @@ Then press the **Simulate 10,000 times** button and the site will run 10,000 sim
 
 ## Credits
 
-I was introduced to Monte Carlo estimation by Adrian Fitolani. He has a [blog post](http://scrumage.com/blog/2015/09/agile-project-forecasting-the-monte-carlo-method/) with spreadsheet implementation and video documenting his approach. My method is simpler (no use of Takt time or re-sampling).
+I was introduced to Monte Carlo estimation by Adrian Fittolani. He has a [blog post](http://scrumage.com/blog/2015/09/agile-project-forecasting-the-monte-carlo-method/) with spreadsheet implementation and video documenting his approach. My method is simpler (no use of Takt time or re-sampling).
 
 My frequent collaborator [Tim Newbold](skillfire.co/tim) got this project started and kicked off the coding.
 
