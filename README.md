@@ -5,7 +5,7 @@ Online demo: [http://monte-carlo-estimation.meteor.com/](http://monte-carlo-esti
 
 It gives an objective view of the uncertainty around project estimation based on historical data.
 
-This is a #NoEstimates(http://neilkillick.com/category/noestimates/) technique!
+Despite having the word estimation in its title, this qualifies as a [#NoEstimates](http://neilkillick.com/category/noestimates/) technique!
 
 ## Usage
 
@@ -37,7 +37,7 @@ Then press the **Simulate 10,000 times** button and the site will run 10,000 sim
 
 ## Notes
 
-- You could alternatively use story points (or any other units) instead of number of stories.
+- You could alternatively use story points (or any other units) instead of number of stories, which would make this a #Estimates technique. ;-)
 - Sprint length is similarly arbitrary.
 - Additional stories that occur due to scope expansion, and time diverted to other areas by the team is not reflected. You'll need to allow for that yourself.
 
