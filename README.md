@@ -1,11 +1,13 @@
 # Monte Carlo Estimation
 Estimate how long a new project will take based on historical team performance.
 
-Online demo: [http://monte-carlo-estimation.meteor.com/](http://monte-carlo-estimation.meteor.com/)
+Online demo: [https://skillfire.co/project-forecaster](https://skillfire.co/project-forecaster)
 
 It gives an objective view of the uncertainty around project estimation based on historical data.
 
 Despite having the word estimation in its title, this qualifies as a [#NoEstimates](http://neilkillick.com/category/noestimates/) technique!
+
+Single file version is [monte-carlo-estimation.html](https://github.com/danprager/Monte-Carlo-Estimation/blob/master/monte-carlo-estimation.html) using Ractive.js, ported from the older meteor.js version. 
 
 ## Usage
 
@@ -42,7 +44,7 @@ Then press the **Simulate 10,000 times** button and the site will run 10,000 sim
 - Additional stories that occur due to scope expansion, and time diverted to other areas by the team is not reflected. You'll need to allow for that yourself.
 
 ## Dependencies
-- [Meteor](https://www.meteor.com/)
+- [Ractive.js](http://www.ractivejs.org/) or [Meteor](https://www.meteor.com/)
 - [Bootstrap](http://getbootstrap.com/)
 - [Google charts API](https://chart.googleapis.com)
 
