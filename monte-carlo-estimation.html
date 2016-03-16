@@ -1,0 +1,236 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>Monte Carlo Estimation</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+    <script src='http://cdn.ractivejs.org/latest/ractive.min.js'></script>
+</head>
+
+<body>
+    <div id='ractive'></div>
+
+    <script id='template' type='text/ractive'>
+
+        <div class="container">
+            <br/>
+            <div class="row">
+                <div class="col-md-7">
+                    <div class='jumbotron'>
+                        <h1>Monte Carlo Estimation</h1>
+                        <br/>
+                        <form class="new-task">
+                            <div class="form-group">
+                                <p>Completed stories in past sprints
+                                    <input type="text" id='past' value={{past_sprints}} size='44' />
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <p>How many stories are in the new project?&nbsp;
+                                    <input type="number" id='size' value='{{project_size}}' min='{{project_min}}' max='{{project_max}}' />
+                                </p>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <input type="button" on-click="run" class="btn btn-primary btn-lg" value="Perform 10,000 simulations">
+                            </div>
+                        </form>
+                    </div>
+                    <!-- jumbotron -->
+                </div>
+                <!-- col -->
+
+                <div class="col-md-5 panel panel-default">
+                    {{#results}}
+                    <div class='panel-body' id='results'>
+                        <h1>Results</h1>
+                        <table>
+                            <tr>
+                                <td><b>Full range</b>:</td>
+                                <td> {{min}} &ndash; {{max}} sprints</td>
+                            </tr>
+                            <tr>
+                                <td><b>90% confidence</b>:&nbsp;</td>
+                                <td>{{lower}} &ndash; {{upper}} sprints</td>
+                            </tr>
+                            <tr>
+                                <td><b>Median</b>:</td>
+                                <td>{{median}} sprints</td>
+                            </tr>
+                        </table>
+
+                        <h3>Likelihood of project completion</h3>
+                        <table>
+                            <tr>
+                                <td> <img src='{{chart}}' /> </td>
+                            </tr>
+                            <tr>
+                                <td style='text-align: center'><i>Number of sprints</i></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- panel -->
+                    {{/results}}
+                </div>
+                <!-- col -->
+            </div>
+            <!-- row -->
+
+            <div class='row'>
+                <h2>Attributions & License</h2>
+
+                <p>Created by <a href="https://twitter.com/agilejitsu" target="_blank">Dan Prager</a> with contributions from <a href="https://twitter.com/timnwbld" target="_blank">Tim Newbold</a> for use by <a href="https://skillfire.co" target="_blank">Skillfire</a> consultants and anyone else who may find it valuable.</p>
+
+                <p>
+                    We made this site by adapting and simplifying techniques that <a href='https://twitter.com/adfit11/status/644653927439269888'>Adrian Fittolani</a> explained to us.
+                </p>
+
+                <br><br><br>
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">Monte-Carlo-Estimation</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="skillfire.co/monte-carlo" property="cc:attributionName" rel="cc:attributionURL">Dan Prager</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </div>
+            <!-- row -->
+
+            <a href="https://github.com/danprager/Monte-Carlo-Estimation"><img style="position:
+absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+
+        </div>
+    </script>
+
+    <script>
+        var ractive = new Ractive({
+            el: '#ractive',
+            template: '#template',
+            data: {
+                past_sprints: '5 7 11 12 4 7',
+                project_size: 50,
+                project_min: 1,
+                project_max: 1000,
+                results: false,
+                chart: '',
+                median: '',
+                lower: '',
+                upper: '',
+                min: '',
+                max: '',
+                runs: ''
+            }
+        });
+
+        var run = function() {
+
+            var runs = 10000;
+            var iterations;
+            var past_sprints = ractive.get('past_sprints').replace(',', ' ').split(' ').map(function(s) {
+                return parseInt(s, 10)
+            });
+            var stories = Math.min(ractive.get('project_max'), Math.max(ractive.get('project_min'), ractive.get('project_size')));
+            var simulations = new Array(runs);
+
+            ractive.set('project_size', stories);
+
+            var choice = function(xs) {
+                return xs[Math.floor(Math.random() * xs.length)];
+            }
+
+            var simulate = function(s) {
+                result = 0;
+                while (s > 0) {
+                    done = choice(past_sprints);
+                    result = result + (done > s ? s / done : 1);
+                    s = s - done;
+                }
+                return result;
+            }
+
+            //Create an array of simulated sprints * the number of runs
+            for (i = 0; i < runs + 1; i++) {
+                simulations[i] = simulate(stories);
+            }
+            simulations = simulations.map(function(x) {
+                return Math.round(x * 100) / 100
+            });
+            simulations.sort(function(a, b) {
+                return a - b;
+            });
+
+            var range = function(n) {
+                var result = [];
+                for (i = 0; i < n; i++) {
+                    result.push(i);
+                }
+                return result;
+            }
+
+            var dilute = function(xs, n) {
+                var result = new Array(n);
+                var step = xs.length / n;
+                for (i = 0; i < n - 1; i++) {
+                    result[i] = xs[Math.floor(i * step)];
+                }
+                result[result.length - 1] = xs[xs.length - 1];
+                return result;
+            }
+
+            var googleChart = function(sims) {
+                var m = Math.floor(sims[0]);
+                var M = Math.ceil(sims[sims.length - 1]);
+                var scale = function(x) {
+                    return Math.round(1000 * (x - m) / (M - m)) / 10
+                };
+
+                return "https://chart.googleapis.com/chart" + "?cht=lxy" + "&chs=400x300" + "&chxt=x,y" + "&chts=000000,20" + "&chco=0000FF" + "&chg=" + Math.round(100 / (M - m)) + ",10" + "&chxr=0," + m + "," + M + "|1,0,100" + "&chd=t:" + dilute(sims, 101).map(scale).join(',') + "|" + range(101).join(',');
+            }
+
+            var oneDecimalPlace = function(x) {
+                return Math.round(10 * x) / 10.0;
+            }
+
+            var getSimulationValue = function(x) {
+                return oneDecimalPlace(simulations[Math.floor(runs * x)]);
+            }
+
+            ractive.set('chart', googleChart(simulations));
+            ractive.set('median', getSimulationValue(0.5));
+            ractive.set('lower', getSimulationValue(0.05));
+            ractive.set('upper', getSimulationValue(0.95));
+            ractive.set('min', getSimulationValue(0));
+            ractive.set('max', oneDecimalPlace(simulations[simulations.length - 1]));
+            ractive.set('runs', runs);
+            ractive.set('results', true);
+        };
+
+        var onChange = function() {
+            ractive.set('results', false);
+        };
+
+        var addEvent = function(id, event, fn) {
+            document.getElementById(id).addEventListener(event, fn);
+        };
+
+        var addChangeEvents = function(id, fn) {
+            addEvent(id, 'change', fn);
+            addEvent(id, 'keypress', fn);
+            addEvent(id, 'paste', fn);
+        };
+
+        ractive.on('run', run);
+        addEvent('btnsim', 'click', run);
+        addChangeEvents('past', onChange);
+        addChangeEvents('size', onChange);
+    </script>
+</body>
+
+</html>

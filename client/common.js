@@ -22,7 +22,7 @@ if (Meteor.isClient) {
       'click #btnsim': function () {
 
       event.preventDefault();
-      var runs = 10000; //up this for final edition
+      var runs = 10000;
       var iterations;
       var past_sprints = document.getElementById("past_sprints").value.replace(',', ' ').split(' ').map(function(s){return parseInt(s, 10)});
       var stories = Math.min(1000, Math.max(1, document.getElementById('project_size').value));
