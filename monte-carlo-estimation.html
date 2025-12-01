@@ -1,236 +1,663 @@
-<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset='utf-8'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monte Carlo Estimation</title>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-
-    <script src='https://cdn.jsdelivr.net/npm/ractive@1.3.8/ractive.min.js'></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .input-help {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        #results {
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        #results.show {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        h2 {
+            color: #333;
+            margin: 30px 0 15px 0;
+            font-size: 22px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .error {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            animation: shake 0.5s ease;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .info-box {
+            background: #e8f4f8;
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 14px;
+            color: #0c5460;
+            margin-top: 20px;
+        }
+        
+        .attribution {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .attribution a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .attribution a:hover {
+            text-decoration: underline;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 300px;
+                padding: 10px;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+            
+            button {
+                display: none;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div id='ractive'></div>
-
-    <script id='template' type='text/ractive'>
-
-        <div class="container">
-            <br/>
-            <div class="row">
-                <div class="col-md-7">
-                    <div class='jumbotron'>
-                        <h1>Monte Carlo Estimation</h1>
-                        <br/>
-                        <form class="new-task">
-                            <div class="form-group">
-                                <p>Completed stories in past sprints
-                                    <input type="text" id='past' value={{past_sprints}} size='44' />
-                                </p>
-                            </div>
-                            <div class="form-group">
-                                <p>How many stories are in the new project?&nbsp;
-                                    <input type="number" id='size' value='{{project_size}}' min='{{project_min}}' max='{{project_max}}' />
-                                </p>
-                            </div>
-                            <br/>
-                            <br/>
-                            <div class="form-group">
-                                <input type="button" on-click="run" class="btn btn-primary btn-lg" value="Perform 10,000 simulations">
-                            </div>
-                        </form>
-                    </div>
-                    <!-- jumbotron -->
-                </div>
-                <!-- col -->
-
-                <div class="col-md-5 panel panel-default">
-                    {{#results}}
-                    <div class='panel-body' id='results'>
-                        <h1>Results</h1>
-                        <table>
-                            <tr>
-                                <td><b>Full range</b>:</td>
-                                <td> {{min}} &ndash; {{max}} sprints</td>
-                            </tr>
-                            <tr>
-                                <td><b>90% confidence</b>:&nbsp;</td>
-                                <td>{{lower}} &ndash; {{upper}} sprints</td>
-                            </tr>
-                            <tr>
-                                <td><b>Median</b>:</td>
-                                <td>{{median}} sprints</td>
-                            </tr>
-                        </table>
-
-                        <h3>Likelihood of project completion</h3>
-                        <table>
-                            <tr>
-                                <td> <img src='{{chart}}' /> </td>
-                            </tr>
-                            <tr>
-                                <td style='text-align: center'><i>Number of sprints</i></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <!-- panel -->
-                    {{/results}}
-                </div>
-                <!-- col -->
+    <div class="container">
+        <div class="card">
+            <h1>Monte Carlo Estimation <span class="badge">v2.0</span></h1>
+            <p class="subtitle">Probabilistic project forecasting using historical sprint data</p>
+            
+            <div class="error" id="error"></div>
+            
+            <div class="form-group">
+                <label for="past">Completed <b>stories</b> in past <b>sprints</b> [or whatever*]:</label>
+                <input type="text" id="past" value="5 7 11 12 4 7" placeholder="e.g., 5 7 11 12 4 7">
+                <div class="input-help">Enter numbers separated by spaces or commas</div>
             </div>
-            <!-- row -->
-
-            <div class='row'>
-                <h2>Attributions & License</h2>
-
-                <p>Created by <a href="https://twitter.com/agilejitsu" target="_blank">Dan Prager</a> with contributions from <a href="https://twitter.com/timnwbld" target="_blank">Tim Newbold</a> for use by <a href="https://skillfire.co" target="_blank">Skillfire</a> consultants and anyone else who may find it valuable.</p>
-
-                <p>
-                    We made this site by adapting and simplifying techniques that <a href='https://twitter.com/adfit11/status/644653927439269888'>Adrian Fittolani</a> explained to us.
-                </p>
-
-                <br><br><br>
-                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">Monte-Carlo-Estimation</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="skillfire.co/monte-carlo" property="cc:attributionName" rel="cc:attributionURL">Dan Prager</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            
+            <div class="form-group">
+                <label for="size">Project size (number of stories):</label>
+                <input type="number" id="size" value="50" min="1" max="1000" placeholder="50">
+                <div class="input-help">Total stories in your backlog</div>
             </div>
-            <!-- row -->
-
-            <a href="https://github.com/danprager/Monte-Carlo-Estimation"><img style="position:
-absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
-
+            
+            <button id="runBtn">
+                <span id="btnText">Perform 10,000 simulations</span>
+            </button>
+            
+            <div class="info-box">
+                <strong>💡*Note:</strong> You can think in different <b>units</b> if you prefer, e.g. <i>story points</i> or <i>tasks</i> instead of <b>stories</b>, <i>weeks</i> or even <i>days</i> instead of <b>sprints</b>.
+            </div>
         </div>
-    </script>
+        
+        <div class="card" id="results">
+            <h1>Results</h1>
+            
+            <div class="results-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Full Range</div>
+                    <div class="stat-value" id="rangeText">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">90% Confidence</div>
+                    <div class="stat-value" id="confidenceText">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Median</div>
+                    <div class="stat-value" id="medianText">-</div>
+                </div>
+            </div>
+            
+            <h2>Cumulative Probability Distribution</h2>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            
+            <div class="info-box" style="margin-top: 20px;">
+                <strong>💡 How to read this chart:</strong> Find a sprint count on the x-axis, look up to the curve, then across to the y-axis to see the probability of completing by that sprint.
+            </div>
+        </div>
+        
+        <div class="attribution">
+            <h2 style="margin-top: 0;">About This Tool</h2>
+            <p style="margin-bottom: 15px;">Monte Carlo simulation uses random sampling from historical data to predict future outcomes. This tool runs 10,000 simulations of your project, each time randomly selecting sprint velocities from your past performance to estimate completion time.</p>
+            
+            <p><strong>Created by:</strong> <a href="https://www.linkedin.com/in/danielaprager/" target="_blank">Dan Prager</a> with contributions from <a href="https://www.linkedin.com/in/timnewbold/" target="_blank">Tim Newbold</a> and modernised with Claude Sonnet 4.5</p>
+            
+            <p style="margin-top: 15px;"><strong>November 2024 update:</strong> Rebuilt with vanilla JavaScript, Chart.js, and responsive design</p>
+            
+            <p style="margin-top: 15px;">
+                <strong>GitHub:</strong> <a href="https://github.com/danprager/Monte-Carlo-Estimation" target="_blank">github.com/danprager/Monte-Carlo-Estimation</a>
+            </p>
+            
+            <p style="margin-top: 15px; font-size: 12px;">
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                    <img alt="Creative Commons License" style="border-width:0; vertical-align: middle;" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                </a>
+                Licensed under Creative Commons Attribution-ShareAlike 4.0 International License
+            </p>
+        </div>
+    </div>
+
+    <!-- Chart.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
     <script>
-        var ractive = new Ractive({
-            el: '#ractive',
-            template: '#template',
-            data: {
-                past_sprints: '5 7 11 12 4 7',
-                project_size: 50,
-                project_min: 1,
-                project_max: 1000,
-                results: false,
-                chart: '',
-                median: '',
-                lower: '',
-                upper: '',
-                min: '',
-                max: '',
-                runs: ''
+        let chartInstance = null;
+
+        // Utility: Parse input string to array of numbers
+        function parseSprintData(input) {
+            return input
+                .replace(/,/g, ' ')
+                .split(/\s+/)
+                .map(s => parseInt(s, 10))
+                .filter(n => !isNaN(n) && n > 0);
+        }
+
+        // Utility: Random choice from array
+        function randomChoice(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        // Core simulation: How many sprints to complete a project?
+        function simulateProject(totalStories, pastSprints) {
+            let remainingStories = totalStories;
+            let sprintsNeeded = 0;
+            
+            while (remainingStories > 0) {
+                const storiesCompleted = randomChoice(pastSprints);
+                
+                if (storiesCompleted >= remainingStories) {
+                    sprintsNeeded += remainingStories / storiesCompleted;
+                    remainingStories = 0;
+                } else {
+                    sprintsNeeded += 1;
+                    remainingStories -= storiesCompleted;
+                }
             }
+            
+            return sprintsNeeded;
+        }
+
+        // Run Monte Carlo simulation
+        function runMonteCarloSimulation(projectSize, pastSprints, numRuns = 10000) {
+            const results = [];
+            
+            for (let i = 0; i < numRuns; i++) {
+                results.push(simulateProject(projectSize, pastSprints));
+            }
+            
+            results.sort((a, b) => a - b);
+            
+            return results;
+        }
+
+        // Calculate statistics from sorted results
+        function calculateStats(sortedResults) {
+            const getPercentile = (p) => {
+                const index = Math.floor(sortedResults.length * p);
+                return Math.round(sortedResults[index] * 10) / 10;
+            };
+            
+            return {
+                min: getPercentile(0),
+                max: Math.round(sortedResults[sortedResults.length - 1] * 10) / 10,
+                median: getPercentile(0.5),
+                lower90: getPercentile(0.05),
+                upper90: getPercentile(0.95)
+            };
+        }
+
+        // Prepare chart data from simulation results
+        function prepareChartData(sortedResults) {
+            const data = [];
+            const totalResults = sortedResults.length;
+            
+            // Sample every 100th point for performance
+            for (let i = 0; i < totalResults; i += 100) {
+                const sprints = sortedResults[i];
+                const probability = (i / totalResults) * 100;
+                data.push({ x: sprints, y: probability });
+            }
+            
+            // Always include the final point
+            data.push({ 
+                x: sortedResults[totalResults - 1], 
+                y: 100 
+            });
+            
+            return data;
+        }
+
+        // Create or update chart
+        function displayChart(sortedResults, stats) {
+            const ctx = document.getElementById('chart').getContext('2d');
+            const chartData = prepareChartData(sortedResults);
+            
+            // Destroy existing chart if it exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Cumulative Probability',
+                        data: chartData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.y.toFixed(1)}% chance of completing in ${context.parsed.x.toFixed(1)} sprints or less`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Number of Sprints',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                stepSize: 1
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Probability of Completion (%)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Display results with animation
+        function displayResults(stats, sortedResults) {
+            // Animate numbers counting up
+            const animateValue = (elementId, end, suffix = ' sprints') => {
+                const element = document.getElementById(elementId);
+                const duration = 800;
+                const start = 0;
+                const startTime = performance.now();
+                
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const current = start + (end - start) * progress;
+                    
+                    if (typeof end === 'string') {
+                        element.textContent = end;
+                    } else {
+                        element.textContent = current.toFixed(1) + suffix;
+                    }
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            };
+            
+            animateValue('rangeText', `${stats.min} – ${stats.max} sprints`);
+            animateValue('confidenceText', `${stats.lower90} – ${stats.upper90} sprints`);
+            animateValue('medianText', stats.median);
+            
+            displayChart(sortedResults, stats);
+            
+            document.getElementById('results').classList.add('show');
+            
+            // Smooth scroll to results
+            setTimeout(() => {
+                document.getElementById('results').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                });
+            }, 100);
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '⚠️ ' + message;
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 5000);
+        }
+
+        // Hide results when inputs change
+        function hideResults() {
+            document.getElementById('results').classList.remove('show');
+        }
+
+        // Main execution
+        document.getElementById('runBtn').addEventListener('click', function() {
+            const pastSprintsInput = document.getElementById('past').value;
+            const projectSize = parseInt(document.getElementById('size').value, 10);
+            
+            const pastSprints = parseSprintData(pastSprintsInput);
+            
+            // Validate inputs
+            if (pastSprints.length === 0) {
+                showError('Please enter at least one valid sprint completion number.');
+                return;
+            }
+            
+            if (isNaN(projectSize) || projectSize < 1) {
+                showError('Please enter a valid project size (at least 1 story).');
+                return;
+            }
+            
+            // Run simulation with loading state
+            const button = document.getElementById('runBtn');
+            const btnText = document.getElementById('btnText');
+            button.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span>Running simulation...';
+            
+            setTimeout(() => {
+                const results = runMonteCarloSimulation(projectSize, pastSprints);
+                const stats = calculateStats(results);
+                
+                displayResults(stats, results);
+                
+                button.disabled = false;
+                btnText.textContent = 'Perform 10,000 simulations';
+            }, 10);
         });
 
-        var run = function() {
-
-            var runs = 10000;
-            var iterations;
-            var past_sprints = ractive.get('past_sprints').replace(',', ' ').split(' ').map(function(s) {
-                return parseInt(s, 10)
-            });
-            var stories = Math.min(ractive.get('project_max'), Math.max(ractive.get('project_min'), ractive.get('project_size')));
-            var simulations = new Array(runs);
-
-            ractive.set('project_size', stories);
-
-            var choice = function(xs) {
-                return xs[Math.floor(Math.random() * xs.length)];
+        // Hide results when inputs change
+        document.getElementById('past').addEventListener('input', hideResults);
+        document.getElementById('size').addEventListener('input', hideResults);
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                document.getElementById('runBtn').click();
             }
-
-            var simulate = function(s) {
-                result = 0;
-                while (s > 0) {
-                    done = choice(past_sprints);
-                    result = result + (done > s ? s / done : 1);
-                    s = s - done;
-                }
-                return result;
-            }
-
-            //Create an array of simulated sprints * the number of runs
-            for (i = 0; i < runs + 1; i++) {
-                simulations[i] = simulate(stories);
-            }
-            simulations = simulations.map(function(x) {
-                return Math.round(x * 100) / 100
-            });
-            simulations.sort(function(a, b) {
-                return a - b;
-            });
-
-            var range = function(n) {
-                var result = [];
-                for (i = 0; i < n; i++) {
-                    result.push(i);
-                }
-                return result;
-            }
-
-            var dilute = function(xs, n) {
-                var result = new Array(n);
-                var step = xs.length / n;
-                for (i = 0; i < n - 1; i++) {
-                    result[i] = xs[Math.floor(i * step)];
-                }
-                result[result.length - 1] = xs[xs.length - 1];
-                return result;
-            }
-
-            var googleChart = function(sims) {
-                var m = Math.floor(sims[0]);
-                var M = Math.ceil(sims[sims.length - 1]);
-                var scale = function(x) {
-                    return Math.round(1000 * (x - m) / (M - m)) / 10
-                };
-
-                return "https://chart.googleapis.com/chart" + "?cht=lxy" + "&chs=400x300" + "&chxt=x,y" + "&chts=000000,20" + "&chco=0000FF" + "&chg=" + Math.round(100 / (M - m)) + ",10" + "&chxr=0," + m + "," + M + "|1,0,100" + "&chd=t:" + dilute(sims, 101).map(scale).join(',') + "|" + range(101).join(',');
-            }
-
-            var oneDecimalPlace = function(x) {
-                return Math.round(10 * x) / 10.0;
-            }
-
-            var getSimulationValue = function(x) {
-                return oneDecimalPlace(simulations[Math.floor(runs * x)]);
-            }
-
-            ractive.set('chart', googleChart(simulations));
-            ractive.set('median', getSimulationValue(0.5));
-            ractive.set('lower', getSimulationValue(0.05));
-            ractive.set('upper', getSimulationValue(0.95));
-            ractive.set('min', getSimulationValue(0));
-            ractive.set('max', oneDecimalPlace(simulations[simulations.length - 1]));
-            ractive.set('runs', runs);
-            ractive.set('results', true);
-        };
-
-        var onChange = function() {
-            ractive.set('results', false);
-        };
-
-        var addEvent = function(id, event, fn) {
-            document.getElementById(id).addEventListener(event, fn);
-        };
-
-        var addChangeEvents = function(id, fn) {
-            addEvent(id, 'change', fn);
-            addEvent(id, 'keypress', fn);
-            addEvent(id, 'paste', fn);
-        };
-
-        ractive.on('run', run);
-        addEvent('btnsim', 'click', run);
-        addChangeEvents('past', onChange);
-        addChangeEvents('size', onChange);
+        });
     </script>
 </body>
-
 </html>
