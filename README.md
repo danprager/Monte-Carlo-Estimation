@@ -1,13 +1,13 @@
 # Monte Carlo Estimation
 Estimate how long a new project will take based on historical team performance.
 
-Online demo: [https://skillfire.co/project-forecaster](https://skillfire.co/project-forecaster)
+Online demo: [danprager.github.io/Monte-Carlo-Estimation](https://danprager.github.io/Monte-Carlo-Estimation/)
 
 It gives an objective view of the uncertainty around project estimation based on historical data.
 
 Despite having the word estimation in its title, this qualifies as a [#NoEstimates](http://neilkillick.com/category/noestimates/) technique!
 
-Single file version is [monte-carlo-estimation.html](https://github.com/danprager/Monte-Carlo-Estimation/blob/master/monte-carlo-estimation.html) using Ractive.js, ported from the older meteor.js version. 
+The single file version is all in [index.html](https://github.com/danprager/Monte-Carlo-Estimation/blob/master/index.html).
 
 ## Usage
 
@@ -43,22 +43,16 @@ Then press the **Simulate 10,000 times** button and the site will run 10,000 sim
 - Sprint length is similarly arbitrary.
 - Additional stories that occur due to scope expansion, and time diverted to other areas by the team is not reflected. You'll need to allow for that yourself.
 
-## Dependencies
-- [Ractive.js](http://www.ractivejs.org/) or [Meteor](https://www.meteor.com/)
-- [Bootstrap](http://getbootstrap.com/)
-- [Google charts API](https://chart.googleapis.com)
-
+## Dependency
+- [Chart.js](https://www.chartjs.org/)
 
 ## Credits
 
 I was introduced to Monte Carlo estimation by Adrian Fittolani. He has a [blog post](http://scrumage.com/blog/2015/09/agile-project-forecasting-the-monte-carlo-method/) with spreadsheet implementation and video documenting his approach. My method is simpler (no use of Takt time or re-sampling).
 
-My frequent collaborator [Tim Newbold](skillfire.co/tim) got this project started and kicked off the coding.
+My friend and sometime collaborator [Tim Newbold](https://www.linkedin.com/in/timnewbold/) got this project started and kicked off the coding in 2016. In 2025 I modernised and fixed it with Claude Sonnet 4.5, after persistent nudging from [Andrew Elms](https://www.linkedin.com/in/andrew-elms-7889a512a/).
 
 
 ## License
 
 [CreativeCommons Attribution-ShareAlike-4.0](http://creativecommons.org/licenses/by-sa/4.0/)
-
-
-
