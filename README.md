@@ -9,6 +9,9 @@ Despite having the word estimation in its title, this qualifies as a [#NoEstimat
 
 The single file version is all in [index.html](https://github.com/danprager/Monte-Carlo-Estimation/blob/master/index.html).
 
+## The Idea
+I have a blog post called [The #NoEstimates game](https://agile-jitsu.blogspot.com/2016/04/the-noestimates-game.html) that will help you and your stakeholders understand what's really going on through explanation and a bunch of dice rolling! I recommend you play the manual game with stakeholders before using the tool in real projects.
+
 ## Usage
 
 Enter the number of user stories completed by a team over a number of sprints, e.g.
@@ -34,7 +37,7 @@ In the box **Completed stories in past sprints** you would enter
 The other input is the number of stories in an upcoming project, say **85**. The tool is limited to between 1 and 1000 stories.
 
 
-Then press the **Simulate 10,000 times** button and the site will run 10,000 simulations and calculate a distribution reflecting the range and frequency of project durations.
+Then press the **Perform 10,000 simulations** button and the site will run 10,000 simulations (surprise!) and calculate a distribution reflecting the range and frequency of project durations.
 
 
 ## Notes
