@@ -301,12 +301,12 @@
     <div class="container">
         <div class="card">
             <h1>Monte Carlo Estimation <span class="badge">v2.0</span></h1>
-            <p class="subtitle">Probabilistic project forecasting using historical data</p>
+            <p class="subtitle">Probabilistic project forecasting using historical sprint data</p>
             
             <div class="error" id="error"></div>
             
             <div class="form-group">
-                <label for="past">Completed <b>stories</b> in past <b>sprints</b> [or whatever*]:</label>
+                <label for="past">Completed stories in past sprints:</label>
                 <input type="text" id="past" value="5 7 11 12 4 7" placeholder="e.g., 5 7 11 12 4 7">
                 <div class="input-help">Enter numbers separated by spaces or commas</div>
             </div>
@@ -322,7 +322,7 @@
             </button>
             
             <div class="info-box">
-                <strong>💡*Note:</strong> You can think in different <b>units</b> if you prefer, e.g. <i>story points</i> or <i>tasks</i> instead of <b>stories</b>, <i>weeks</i> or even <i>days</i> instead of <b>sprints</b>.
+                <strong>💡 Note:</strong> You can use whatever units you like, e.g. stories → story points or tasks, sprints → weeks or days
             </div>
         </div>
         
@@ -344,7 +344,7 @@
                 </div>
             </div>
             
-            <h2>Will it be Done by Sprint X?</h2>
+            <h2>Cumulative Probability Distribution</h2>
             <div class="chart-container">
                 <canvas id="chart"></canvas>
             </div>
@@ -383,11 +383,25 @@
 
         // Utility: Parse input string to array of numbers
         function parseSprintData(input) {
-            return input
+            const numbers = input
                 .replace(/,/g, ' ')
                 .split(/\s+/)
                 .map(s => parseInt(s, 10))
-                .filter(n => !isNaN(n) && n > 0);
+                .filter(n => !isNaN(n));
+            
+            // Check for negative values
+            const hasNegatives = numbers.some(n => n < 0);
+            if (hasNegatives) {
+                return { error: 'Negative values are not allowed. Please use only zero or positive numbers.' };
+            }
+            
+            // Check for at least one positive value
+            const hasPositive = numbers.some(n => n > 0);
+            if (!hasPositive) {
+                return { error: 'At least one sprint must have completed some work (value > 0).' };
+            }
+            
+            return { values: numbers };
         }
 
         // Utility: Random choice from array
@@ -403,7 +417,11 @@
             while (remainingStories > 0) {
                 const storiesCompleted = randomChoice(pastSprints);
                 
-                if (storiesCompleted >= remainingStories) {
+                // Handle zero velocity sprints
+                if (storiesCompleted === 0) {
+                    sprintsNeeded += 1;
+                    // No progress made this sprint
+                } else if (storiesCompleted >= remainingStories) {
                     sprintsNeeded += remainingStories / storiesCompleted;
                     remainingStories = 0;
                 } else {
@@ -618,11 +636,19 @@
             const pastSprintsInput = document.getElementById('past').value;
             const projectSize = parseInt(document.getElementById('size').value, 10);
             
-            const pastSprints = parseSprintData(pastSprintsInput);
+            const parseResult = parseSprintData(pastSprintsInput);
+            
+            // Check for parsing errors
+            if (parseResult.error) {
+                showError(parseResult.error);
+                return;
+            }
+            
+            const pastSprints = parseResult.values;
             
             // Validate inputs
             if (pastSprints.length === 0) {
-                showError('Please enter at least one valid sprint completion number.');
+                showError('Please enter at least one sprint value.');
                 return;
             }
             
